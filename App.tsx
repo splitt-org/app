@@ -29,7 +29,7 @@ export default function App() {
     <View style={styles.container}>
       {fontLoaded ? (
         <Stack.Navigator initialRouteName='HomeScreen'>
-          <Stack.Screen name="HomeScreen" component={CameraScreen} options={{ headerShown: false }}/>
+          <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }}/>
           <Stack.Screen name="SplitScreen" component={SplitScreen} options={{ headerShown: false }}/>
 
         </Stack.Navigator>
