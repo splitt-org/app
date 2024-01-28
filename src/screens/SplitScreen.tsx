@@ -193,7 +193,7 @@ function SplitScreen() {
                         <>
                           {getRecieptInfoFromUser(personList[currentPersonIndex].name).itemList.map(
                             (item: any, index: number) => (
-                              <View key={index} style={styles.recieptDetail}>
+                              <View key={`item-${index}`} style={styles.recieptDetail}>
                                 <Text style={styles.title}>{item.title}</Text>
                                 <Text style={styles.price}>${item.price}</Text>
                               </View>
@@ -201,14 +201,14 @@ function SplitScreen() {
                           )}
                           <Divider />
 
-                          <View key={index} style={styles.recieptDetail}>
+                          <View key={currentPersonIndex} style={styles.recieptDetail}>
                             <Text style={styles.title}>Subtotal</Text>
                             <Text style={styles.price}>
                               ${(getRecieptInfoFromUser(personList[currentPersonIndex].name).totalCost).toFixed(2)}
                             </Text>
                           </View>
 
-                          <View key={index} style={styles.recieptDetail}>
+                          <View key={currentPersonIndex} style={styles.recieptDetail}>
                             <Text style={styles.title}>Tax</Text>
                             <Text style={styles.price}>
                               $
@@ -217,7 +217,7 @@ function SplitScreen() {
                             </Text>
                           </View>
 
-                          <View key={index} style={styles.recieptDetail}>
+                          <View key={currentPersonIndex} style={styles.recieptDetail}>
                             <Text style={styles.title}>Tip</Text>
                             <Text style={styles.price}>
                               $
@@ -226,7 +226,7 @@ function SplitScreen() {
                             </Text>
                           </View>
 
-                          <View key={index} style={styles.recieptDetail}>
+                          <View key={currentPersonIndex} style={styles.recieptDetail}>
                             <Text style={styles.title}>Total</Text>
                             <Text style={styles.price}>
                               $
