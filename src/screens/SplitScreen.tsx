@@ -11,13 +11,6 @@ import Divider from "../components/Divider";
 import { styles } from "../styles/SplitScreen";
 import Checkbox from "expo-checkbox";
 
-type person = {
-  name: string;
-  color: string;
-  pressed: boolean;
-  deletable: boolean;
-};
-
 function getColor() {
   const colors = [
     "#FFA68B",
@@ -41,6 +34,32 @@ function defaultPerson() {
     },
   ]
 }
+
+function SplitCheckbox({ items, setItems, itemIndex, personIndex }: any) {
+  const [isChecked, setChecked] = useState<boolean>(items[itemIndex].people[personIndex].pressed);
+
+  const handleCheckBox = () => {
+    setChecked(currentChecked => !currentChecked);
+
+    setItems((currentItems: any) => currentItems.map((item: any, idx: number) => 
+      idx === itemIndex ? {
+        ...item,
+        people: item.people.map((person: any, pIdx: number) => 
+          pIdx === personIndex ? { ...person, pressed: !isChecked } : person)
+      } : item
+    ));
+    console.log(items[1].people);
+  };
+
+
+  return (
+      <Checkbox
+        onValueChange={handleCheckBox}
+        value={items[itemIndex].people[personIndex].pressed}
+      />
+  );
+}
+
 function SplitScreen() {
   const [personList, setPersonList] = useState(defaultPerson());
   const [items, setItems] = useState([
@@ -55,10 +74,9 @@ function SplitScreen() {
       people: defaultPerson()
     },
   ]);
-  const [itemIndex, setItemIndex] = useState(0);
   const [addPersonModalOpen, setAddPersonModalOpen] = useState(false);
   const [splitWithModalOpen, setSplitWithModalOpen] = useState(false);
-  const [isChecked, setChecked] = useState(false);
+  const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [nameInput, setNameInput] = useState("");
   const addPerson = (name: string, color: string) => {
     setPersonList((prevList) => [
@@ -93,17 +111,9 @@ function SplitScreen() {
     setNameInput("");
   };
 
-  const handleCheckBox = (people: any) => {
-    setChecked(!isChecked);
-    people[itemIndex].pressed = !isChecked
-    //person.pressed = !isChecked
-    //person = personList
-  };
-
   const handleSplitWithPress = (index: number, close: boolean) => {
-    console.log("index")
-    setSplitWithModalOpen(close)
-    setItemIndex(index)
+    setSplitWithModalOpen(close);
+    setCurrentItemIndex(index);
   }
 
   return (
@@ -174,8 +184,8 @@ function SplitScreen() {
 
         <Divider />
 
-        {items.map((item, index) => (
-          <View key={index} style={styles.recieptItemContainer}>
+        {items.map((item, itemIndex) => (
+          <View key={itemIndex} style={styles.recieptItemContainer}>
             <View style={styles.itemDetails}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.price}>${item.price}</Text>
@@ -183,10 +193,10 @@ function SplitScreen() {
 
             <View style={styles.smallPersonButtons}>
               {item.people.map(
-                (person, index) =>
+                (person, personIndex) =>
                   person.pressed && (
                     <View
-                      key={index}
+                      key={personIndex}
                       style={[
                         styles.squareAvatarFrameSmall,
                         { backgroundColor: person.color },
@@ -198,7 +208,7 @@ function SplitScreen() {
                     </View>
                   )
               )}
-              <TouchableOpacity onPress={() => handleSplitWithPress(index, true)}>
+              <TouchableOpacity onPress={() => handleSplitWithPress(itemIndex, true)}>
                 <Text style={styles.plusButtonTextLight}>+</Text>
               </TouchableOpacity>
               {splitWithModalOpen && (
@@ -208,7 +218,7 @@ function SplitScreen() {
                       <View style={styles.modalContent}>
                         <TouchableOpacity
                           style={styles.closeButton}
-                          onPress={() => handleSplitWithPress(index, false)}
+                          onPress={() => handleSplitWithPress(itemIndex, false)}
                         >
                           <Text style={styles.closeButtonText}>X</Text>
                         </TouchableOpacity>
@@ -217,9 +227,9 @@ function SplitScreen() {
 
                         <Divider />
 
-                        {item.people.map((person, index) => (
+                        {item.people.map((person, personIndex) => (
                           <View
-                            key={index}
+                            key={personIndex}
                             style={[
                               {
                                 flexDirection: "row",
@@ -229,11 +239,13 @@ function SplitScreen() {
                               },
                             ]}
                           >
-                            <Checkbox
-                              onValueChange={() => handleCheckBox(item.people)}
-                              value={person.pressed}
+                            
+                            <SplitCheckbox 
+                              items={items}
+                              setItems={setItems}
+                              itemIndex={currentItemIndex}
+                              personIndex={personIndex}
                             />
-
                             <Text>{person.deletable ? person.name : "ME"}</Text>
                           </View>
                         ))}
