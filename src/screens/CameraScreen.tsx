@@ -5,8 +5,10 @@ import EntypoIcon from 'react-native-vector-icons/Entypo';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import { Camera, CameraType, ImageType } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function CameraScreen() {
+export default function CameraScreen({ navigation }: any) {
   const [type, setType] = useState(CameraType.back);
   const [image, setImage] = useState(null);
   const cameraRef = useRef<Camera>(null);
@@ -23,22 +25,96 @@ export default function CameraScreen() {
       base64: true,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0,
     });
 
+    
   };
 
   const takePicture: () => void = async () => {
     if (!cameraRef.current) return;
-    let { base64 } = await cameraRef.current.takePictureAsync({
-      base64: true,
-      imageType: ImageType.png,
+    let photo = await cameraRef.current.takePictureAsync({
+      base64: false,
+      quality: 0
     });
-    if (!base64) {
+
+    if (!photo) {
+      console.log('Photo not captured');
+      return;
+    }
+
+    const resizedPhoto = await resizeImageToTargetSize(photo.uri, 1024);
+    if (!resizedPhoto) {
+      console.log('Unable to resize photo under 1024 KB');
+      return;
+    }
+
+    if (!resizedPhoto.base64) {
       console.log('Base 64 not created');
       return;
     }
-    base64 = base64.split(' ').join('+');
+
+    const base64 = resizedPhoto.base64.split(' ').join('+');
+
+    const receiptData = await analyzeReceipt(base64);
+    console.log(receiptData);
+
+    try {
+      await AsyncStorage.setItem('receiptData', JSON.stringify(receiptData));
+      navigation.navigate('SplitScreen')
+    } catch (e) {
+      console.log('Error saving receipt data to local storage', e);
+    }
+  };
+
+  const resizeImageToTargetSize = async (uri: string, targetSizeInKB: number) => {
+    let compression = 1;
+    let width = 800; 
+    let base64Length;
+
+    do {
+      const result = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: width } }],
+        { compress: compression, format: ImageManipulator.SaveFormat.PNG, base64: true }
+      );
+
+      base64Length = Math.ceil((result.base64!!.length * 3) / 4);
+      if (base64Length > targetSizeInKB * 1024) {
+        if (compression > 0.1) {
+          compression -= 0.1; 
+        } else {
+          width -= 100; 
+        }
+      } else {
+        return result;
+      }
+    } while (base64Length > targetSizeInKB * 1024);
+
+    return null;
+  };
+
+
+  const analyzeReceipt = async (base64: string) => {
+    const url = 'https://api-iota-green.vercel.app/v1/receipt'
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'image': base64,
+      }),
+    };
+    const res = await fetch(url, options);
+    const { success, data, error } = await res.json();
+
+    if (!success) {
+      console.log(error);
+      return null;
+    };
+
+    return data;
   };
 
   return (
