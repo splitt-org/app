@@ -85,7 +85,7 @@ function SplitScreen() {
   const [addPersonModalOpen, setAddPersonModalOpen] = useState(false);
   const [splitWithModalOpen, setSplitWithModalOpen] = useState(false);
   const [avatarFrameModalOpen, setAvatarFrameModalOpen] = useState(false);
-
+  const [currentPersonIndex, setCurrentPersonIndex] = useState(0);
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [nameInput, setNameInput] = useState("");
   const addPerson = (name: string, color: string) => {
@@ -167,7 +167,10 @@ function SplitScreen() {
                   styles.squareAvatarFrame,
                   { backgroundColor: person.color },
                 ]}
-                onPress={() => setAvatarFrameModalOpen(true)}
+                onPress={() => { 
+                  setCurrentPersonIndex(index)
+                  setAvatarFrameModalOpen(true)
+                }}
               >
                 <Text>
                   {person.deletable ? person.name[0].toUpperCase() : "ME"}
@@ -185,10 +188,10 @@ function SplitScreen() {
                           <Text style={styles.closeButtonText}>X</Text>
                         </TouchableOpacity>
 
-                        <Text style={styles.modalHeader}>{person.name}</Text>
+                        <Text style={styles.modalHeader}>{personList[currentPersonIndex].name}</Text>
                         <Divider />
                         <>
-                          {getRecieptInfoFromUser(person.name).itemList.map(
+                          {getRecieptInfoFromUser(personList[currentPersonIndex].name).itemList.map(
                             (item: any, index: number) => (
                               <View key={index} style={styles.recieptDetail}>
                                 <Text style={styles.title}>{item.title}</Text>
@@ -201,7 +204,7 @@ function SplitScreen() {
                           <View key={index} style={styles.recieptDetail}>
                             <Text style={styles.title}>Subtotal</Text>
                             <Text style={styles.price}>
-                              ${(getRecieptInfoFromUser(person.name).totalCost).toFixed(2)}
+                              ${(getRecieptInfoFromUser(personList[currentPersonIndex].name).totalCost).toFixed(2)}
                             </Text>
                           </View>
 
@@ -209,7 +212,7 @@ function SplitScreen() {
                             <Text style={styles.title}>Tax</Text>
                             <Text style={styles.price}>
                               $
-                              {(getRecieptInfoFromUser(person.name).totalCost *
+                              {(getRecieptInfoFromUser(personList[currentPersonIndex].name).totalCost *
                                 0.15).toFixed(2)}
                             </Text>
                           </View>
@@ -218,7 +221,7 @@ function SplitScreen() {
                             <Text style={styles.title}>Tip</Text>
                             <Text style={styles.price}>
                               $
-                              {(getRecieptInfoFromUser(person.name).totalCost *
+                              {(getRecieptInfoFromUser(personList[currentPersonIndex].name).totalCost *
                                 0.18).toFixed(2)}
                             </Text>
                           </View>
@@ -227,10 +230,10 @@ function SplitScreen() {
                             <Text style={styles.title}>Total</Text>
                             <Text style={styles.price}>
                               $
-                              {(getRecieptInfoFromUser(person.name).totalCost +
-                                getRecieptInfoFromUser(person.name).totalCost *
+                              {(getRecieptInfoFromUser(personList[currentPersonIndex].name).totalCost +
+                                getRecieptInfoFromUser(personList[currentPersonIndex].name).totalCost *
                                   0.15 +
-                                getRecieptInfoFromUser(person.name).totalCost *
+                                getRecieptInfoFromUser(personList[currentPersonIndex].name).totalCost *
                                   0.18).toFixed(2)}{" "}
                             </Text>
                           </View>
