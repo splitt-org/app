@@ -1,11 +1,29 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Button, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  Button,
+  Text,
+  TouchableOpacity,
+  Animated,
+} from 'react-native';
 import { Slider } from '@rneui/themed';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function EZSplitScreen({ navigation }: any) {
   const [value, setValue] = useState(2);
+
+  const driftAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => driftIn(), []);
+  const driftIn = () => {
+    Animated.timing(driftAnim, {
+      toValue: -70,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  };
 
   return (
     <View style={styles.container}>
@@ -17,7 +35,12 @@ export default function EZSplitScreen({ navigation }: any) {
         <Text style={styles.topText}>How many people are in your party?</Text>
       </View>
       <View style={styles.bottomPanel}>
-        <View style={styles.sliderPanel}>
+        <Animated.View
+          style={[
+            styles.sliderPanel,
+            { transform: [{ translateY: driftAnim }] },
+          ]}
+        >
           <View style={styles.sliderLabel}>
             <View style={styles.sliderLabelHorz}>
               <View style={styles.sliderNumberBox}>
@@ -59,14 +82,17 @@ export default function EZSplitScreen({ navigation }: any) {
               >
                 <Text style={styles.actionItemText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.confirmButton}
-                onPress={() => navigation.navigate('PartyNumberScreen', {partyNum: value})}
-                >
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={() =>
+                  navigation.navigate('PartyNumberScreen', { partyNum: value })
+                }
+              >
                 <Text style={styles.actionItemTextConfirm}>Confirm</Text>
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </View>
   );
@@ -98,15 +124,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
-  bottomPanel: {
-    paddingTop: 100,
+  bottomPanel: {    paddingTop: 100,
     display: 'flex',
     alignItems: 'center',
     flex: 7,
   },
   sliderPanel: {
     width: '80%',
-    height: '100%',
+    height: '120%',
     backgroundColor: 'white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -120,12 +145,12 @@ const styles = StyleSheet.create({
     borderRadius: 7,
   },
   sliderNumber: {
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: '500',
   },
   sliderNumberLabel: {
     fontWeight: '500',
-    fontSize: 20,
+    fontSize: 26,
   },
   sliderLabel: {
     display: 'flex',

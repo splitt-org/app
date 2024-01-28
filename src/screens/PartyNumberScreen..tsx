@@ -1,13 +1,37 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
-import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  Animated,
+} from 'react-native';
 
 export default function PartyNumberScreen({ route, navigation }: any) {
   const partyNum = route.params.partyNum;
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnimBottom = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => fadeIn(), []);
+  const fadeIn = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1500,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(fadeAnimBottom, {
+      toValue: 1,
+      duration: 1500,
+      delay: 1250,
+      useNativeDriver: true,
+    }).start();
+  };
+
   setTimeout(() => {
-    navigation.navigate('TotalBill', {partyNum: partyNum}); //this.props.navigation.navigate('Login')
-}, 1000);
+    navigation.navigate('TotalBill', { partyNum: partyNum }); //this.props.navigation.navigate('Login')
+  }, 3000);
 
   return (
     <View style={styles.container}>
@@ -15,8 +39,12 @@ export default function PartyNumberScreen({ route, navigation }: any) {
         colors={['#F64610', '#FF683A']}
         style={styles.background}
       />
-      <Text style={styles.titleText}>{partyNum} in your party?</Text>
-      <Text style={styles.titleText}>Got it...</Text>
+      <Animated.Text style={[styles.titleText, { opacity: fadeAnim }]}>
+        {partyNum} in your party?
+      </Animated.Text>
+      <Animated.Text style={[styles.titleText, { opacity: fadeAnimBottom }]}>
+        Got it...
+      </Animated.Text>
       <ActivityIndicator style={styles.loader} size='large' color='white' />
     </View>
   );
@@ -28,7 +56,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: 200,
   },
   titleText: {
     fontSize: 32,
@@ -36,7 +63,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   loader: {
-    marginTop: 70
+    marginTop: 70,
   },
   background: {
     position: 'absolute',
