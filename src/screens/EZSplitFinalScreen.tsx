@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Text, ActivityIndicator, Animated, Easing } from 'react-native';
+import { View, StyleSheet, Text, ActivityIndicator, Animated, Easing, TouchableOpacity } from 'react-native';
 
 export default function EZSplitFinalScreen({ route, navigation }: any) {
   const finalPrice = Math.round(route.params.finalPrice * 100) / 100;
@@ -29,6 +29,12 @@ export default function EZSplitFinalScreen({ route, navigation }: any) {
       />
       <Text style={styles.titleText}>Everyone will pay</Text>
       <Text style={styles.largeTitleText}> ${price}</Text>
+
+      <TouchableOpacity style={styles.done}
+            onPress={() => navigation.navigate('HomeScreen')}
+            >
+          <Text style={styles.actionItemText}>Done</Text>
+        </TouchableOpacity>
     </View>
   );
 }
@@ -39,7 +45,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: 200,
+    paddingBottom: 50,
   },
   titleText: {
     marginTop: 100,
@@ -58,5 +64,16 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     height: '300%',
+  },
+  done: {
+    margin: 50,
+    backgroundColor: 'white',
+    paddingVertical: 20,
+    paddingHorizontal: 36,
+    borderRadius: 4,
+  },
+  actionItemText: {
+    fontWeight: '400',
+    fontSize: 16,
   },
 });
