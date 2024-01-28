@@ -6,6 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './src/screens/HomeScreen';
 import SplitScreen from './src/screens/SplitScreen';
+import CameraScreen from './src/screens/CameraScreen';
 
 const Stack = createStackNavigator();
 
@@ -28,7 +29,7 @@ export default function App() {
     <View style={styles.container}>
       {fontLoaded ? (
         <Stack.Navigator initialRouteName='HomeScreen'>
-          <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }}/>
+          <Stack.Screen name="HomeScreen" component={CameraScreen} options={{ headerShown: false }}/>
           <Stack.Screen name="SplitScreen" component={SplitScreen} options={{ headerShown: false }}/>
 
         </Stack.Navigator>
