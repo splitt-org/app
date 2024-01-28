@@ -1,4 +1,4 @@
-import { Camera, CameraType, ImageType } from 'expo-camera';
+import { Camera, CameraType, FlashMode, ImageType } from 'expo-camera';
 import { RefObject, useRef, useState } from 'react';
 import {
   View,
@@ -29,7 +29,11 @@ export default function OCRComponent({ type, cameraRef }: { type: CameraType, ca
 
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} type={type} ref={cameraRef}>
+      <Camera 
+        style={styles.camera} 
+        type={type} 
+        ref={cameraRef} 
+      >
       </Camera>
     </View>
   );

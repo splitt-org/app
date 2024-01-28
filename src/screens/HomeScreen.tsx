@@ -6,13 +6,15 @@ function HomeScreen({ navigation }: any ) {
   return (
     <View style={styles.container}>
       <TouchableOpacity 
-        onPress={() => navigation.navigate('SplitScreen')}
+        onPress={() => navigation.navigate('CameraScreen')}
         style={[styles.option, { backgroundColor: '#F64610' }]}>
         <Text style={styles.optionText}>split/IT</Text>
         <Text style={styles.optionTextSmall}>split the bill amongst your party</Text>
       </TouchableOpacity>
       
-      <TouchableOpacity style={[styles.option, { backgroundColor: '#FFFFFF' }]}>
+      <TouchableOpacity style={[styles.option, { backgroundColor: '#FFFFFF' }]}
+        onPress={() => navigation.navigate('EZSplitScreen')}
+        >
         <Text style={styles.optionTextWhiteBg}>ez/SPLIT</Text>        
         <Text style={styles.optionTextSmallWhiteBg}>equally share the bill amongst your party</Text>
       </TouchableOpacity>
