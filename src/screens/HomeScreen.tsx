@@ -1,11 +1,12 @@
 import React from 'react'
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
+// Todo: On press should open camera
 function HomeScreen({ navigation }: any ) {
   return (
     <View style={styles.container}>
       <TouchableOpacity 
-        onPress={() => navigation.navigate('TODO: Open camera')}
+        onPress={() => navigation.navigate('SplitScreen')}
         style={[styles.option, { backgroundColor: '#F64610' }]}>
         <Text style={styles.optionText}>split/IT</Text>
         <Text style={styles.optionTextSmall}>split the bill amongst your party</Text>
