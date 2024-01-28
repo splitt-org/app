@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -32,31 +32,39 @@ function defaultPerson() {
       pressed: true,
       deletable: false,
     },
-  ]
+  ];
 }
 
 function SplitCheckbox({ items, setItems, itemIndex, personIndex }: any) {
-  const [isChecked, setChecked] = useState<boolean>(items[itemIndex].people[personIndex].pressed);
+  const [isChecked, setChecked] = useState<boolean>(
+    items[itemIndex].people[personIndex].pressed
+  );
 
   const handleCheckBox = () => {
-    setChecked(currentChecked => !currentChecked);
+    setChecked((currentChecked) => !currentChecked);
 
-    setItems((currentItems: any) => currentItems.map((item: any, idx: number) => 
-      idx === itemIndex ? {
-        ...item,
-        people: item.people.map((person: any, pIdx: number) => 
-          pIdx === personIndex ? { ...person, pressed: !isChecked } : person)
-      } : item
-    ));
+    setItems((currentItems: any) =>
+      currentItems.map((item: any, idx: number) =>
+        idx === itemIndex
+          ? {
+              ...item,
+              people: item.people.map((person: any, pIdx: number) =>
+                pIdx === personIndex
+                  ? { ...person, pressed: !isChecked }
+                  : person
+              ),
+            }
+          : item
+      )
+    );
     console.log(items[1].people);
   };
 
-
   return (
-      <Checkbox
-        onValueChange={handleCheckBox}
-        value={items[itemIndex].people[personIndex].pressed}
-      />
+    <Checkbox
+      onValueChange={handleCheckBox}
+      value={items[itemIndex].people[personIndex].pressed}
+    />
   );
 }
 
@@ -66,16 +74,18 @@ function SplitScreen() {
     {
       title: "2x Chicken Strips",
       price: 16.97,
-      people: defaultPerson()
+      people: defaultPerson(),
     },
     {
       title: "1x Cake",
       price: 16.97,
-      people: defaultPerson()
+      people: defaultPerson(),
     },
   ]);
   const [addPersonModalOpen, setAddPersonModalOpen] = useState(false);
   const [splitWithModalOpen, setSplitWithModalOpen] = useState(false);
+  const [avatarFrameModalOpen, setAvatarFrameModalOpen] = useState(false);
+
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [nameInput, setNameInput] = useState("");
   const addPerson = (name: string, color: string) => {
@@ -90,16 +100,19 @@ function SplitScreen() {
     ]);
     // Update all items to be in sync with personList
     setItems((prevItems) =>
-    prevItems.map((item) => ({
-      ...item,
-      people: [...item.people, {
-        name: name,
-        color: color,
-        pressed: false,
-        deletable: true,
-      }],
-    }))
-  );
+      prevItems.map((item) => ({
+        ...item,
+        people: [
+          ...item.people,
+          {
+            name: name,
+            color: color,
+            pressed: false,
+            deletable: true,
+          },
+        ],
+      }))
+    );
   };
 
   const handleAddPerson = () => {
@@ -114,7 +127,22 @@ function SplitScreen() {
   const handleSplitWithPress = (index: number, close: boolean) => {
     setSplitWithModalOpen(close);
     setCurrentItemIndex(index);
-  }
+  };
+
+  const getRecieptInfoFromUser = (name: string) => {
+    console.log(name)
+    const itemList: any = [];
+    let totalCost = 0;
+
+    items.forEach((item) => {
+      if (item.people.some((person) => (person.name === name) && (person.pressed))) {
+        itemList.push(item);
+        totalCost += item.price;
+      }
+    });
+
+    return { itemList, totalCost };
+  };
 
   return (
     <View style={styles.container}>
@@ -132,17 +160,87 @@ function SplitScreen() {
         {/* People buttons */}
         <View style={styles.personButtons}>
           {personList.map((person, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.squareAvatarFrame,
-                { backgroundColor: person.color },
-              ]}
-            >
-              <Text>
-                {person.deletable ? person.name[0].toUpperCase() : "ME"}
-              </Text>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.squareAvatarFrame,
+                  { backgroundColor: person.color },
+                ]}
+                onPress={() => setAvatarFrameModalOpen(true)}
+              >
+                <Text>
+                  {person.deletable ? person.name[0].toUpperCase() : "ME"}
+                </Text>
+              </TouchableOpacity>
+              {avatarFrameModalOpen && (
+                <>
+                  <Modal animationType="fade" transparent={true} visible={true}>
+                    <View style={styles.modalContainer}>
+                      <View style={styles.modalContent}>
+                        <TouchableOpacity
+                          style={styles.closeButton}
+                          onPress={() => setAvatarFrameModalOpen(false)}
+                        >
+                          <Text style={styles.closeButtonText}>X</Text>
+                        </TouchableOpacity>
+
+                        <Text style={styles.modalHeader}>{person.name}</Text>
+                        <Divider />
+                        <>
+                          {getRecieptInfoFromUser(person.name).itemList.map(
+                            (item: any, index: number) => (
+                              <View key={index} style={styles.recieptDetail}>
+                                <Text style={styles.title}>{item.title}</Text>
+                                <Text style={styles.price}>${item.price}</Text>
+                              </View>
+                            )
+                          )}
+                          <Divider />
+
+                          <View key={index} style={styles.recieptDetail}>
+                            <Text style={styles.title}>Subtotal</Text>
+                            <Text style={styles.price}>
+                              ${(getRecieptInfoFromUser(person.name).totalCost).toFixed(2)}
+                            </Text>
+                          </View>
+
+                          <View key={index} style={styles.recieptDetail}>
+                            <Text style={styles.title}>Tax</Text>
+                            <Text style={styles.price}>
+                              $
+                              {(getRecieptInfoFromUser(person.name).totalCost *
+                                0.15).toFixed(2)}
+                            </Text>
+                          </View>
+
+                          <View key={index} style={styles.recieptDetail}>
+                            <Text style={styles.title}>Tip</Text>
+                            <Text style={styles.price}>
+                              $
+                              {(getRecieptInfoFromUser(person.name).totalCost *
+                                0.18).toFixed(2)}
+                            </Text>
+                          </View>
+
+                          <View key={index} style={styles.recieptDetail}>
+                            <Text style={styles.title}>Total</Text>
+                            <Text style={styles.price}>
+                              $
+                              {(getRecieptInfoFromUser(person.name).totalCost +
+                                getRecieptInfoFromUser(person.name).totalCost *
+                                  0.15 +
+                                getRecieptInfoFromUser(person.name).totalCost *
+                                  0.18).toFixed(2)}{" "}
+                            </Text>
+                          </View>
+                        </>
+                      </View>
+                    </View>
+                  </Modal>
+                </>
+              )}
+            </>
           ))}
           <TouchableOpacity
             style={styles.plusButton}
@@ -208,7 +306,9 @@ function SplitScreen() {
                     </View>
                   )
               )}
-              <TouchableOpacity onPress={() => handleSplitWithPress(itemIndex, true)}>
+              <TouchableOpacity
+                onPress={() => handleSplitWithPress(itemIndex, true)}
+              >
                 <Text style={styles.plusButtonTextLight}>+</Text>
               </TouchableOpacity>
               {splitWithModalOpen && (
@@ -239,8 +339,7 @@ function SplitScreen() {
                               },
                             ]}
                           >
-                            
-                            <SplitCheckbox 
+                            <SplitCheckbox
                               items={items}
                               setItems={setItems}
                               itemIndex={currentItemIndex}

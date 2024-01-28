@@ -171,6 +171,14 @@ export const styles = StyleSheet.create({
       flex: 1,
       marginRight: 10,
     },
+    recieptDetail: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 10, // Adjust vertical spacing as needed
+      paddingHorizontal: 20, // Adjust horizontal spacing as needed
+      width: "100%",
+    },
     title: {
       fontSize: 16,
       fontWeight: "600",
